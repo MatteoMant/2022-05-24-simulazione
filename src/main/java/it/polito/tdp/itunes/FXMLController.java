@@ -69,7 +69,7 @@ public class FXMLController {
     	}
     	
     	List<Track> listaCanzoni = this.model.creaLista(preferita, memoriaMassima);
-    	txtResult.appendText("\nLa lista di canzoni trovata è: \n");
+    	txtResult.appendText("\n\nLa lista di canzoni trovata è: \n");
     	if (listaCanzoni == null) {
     		txtResult.appendText("Non è stata trovata alcuna lista!");
     		return;

@@ -44,76 +44,110 @@ public class Model {
 		
 	}
 	
-	public List<Track> creaLista(Track preferita, int memoriaMassima){
-		// calcoliamo la componente connessa di c
-		ConnectivityInspector<Track, DefaultWeightedEdge> ci = new ConnectivityInspector<>(this.grafo);
-		Set<Track> componenteConnessa = ci.connectedSetOf(preferita);
-		
-		List<Track> canzoniValide = new ArrayList<>();
-		canzoniValide.add(preferita);
-		componenteConnessa.remove(preferita);
-		canzoniValide.addAll(componenteConnessa);
-		
-		List<Track> parziale = new ArrayList<>();
-		best = new ArrayList<>();
-		parziale.add(preferita);
-
-		cerca(parziale, canzoniValide, memoriaMassima, 1);		
-		
-		return best;
-	}
-	
-	private void cerca(List<Track> parziale, List<Track> canzoniValide, int memoriaMassima, int livello) {
-		
-		if (sommaBytes(parziale) > memoriaMassima)
-			return;
-		
-		// se non esco, vuol dire che la soluzione parziale è ancora valida
-		if (parziale.size() > best.size()) {
-			best = new LinkedList<>(parziale);
-		}
-		
-		if (livello == canzoniValide.size()) 
-			return; // esco perchè non abbiamo più canzoni da poter aggiungere alla lista
-		
-		
-		
-		parziale.add(canzoniValide.get(livello));
-		cerca(parziale, canzoniValide, memoriaMassima, livello+1);
-		parziale.remove(canzoniValide.get(livello));
-		cerca(parziale, canzoniValide, memoriaMassima, livello+1);
-			
-	}
-	
 //	public List<Track> creaLista(Track preferita, int memoriaMassima){
 //		// calcoliamo la componente connessa di c
 //		ConnectivityInspector<Track, DefaultWeightedEdge> ci = new ConnectivityInspector<>(this.grafo);
 //		Set<Track> componenteConnessa = ci.connectedSetOf(preferita);
-//		
+//				
 //		List<Track> canzoniValide = new ArrayList<>();
-//	
+//
+//		canzoniValide.add(preferita);
+//		componenteConnessa.remove(preferita);
 //		canzoniValide.addAll(componenteConnessa);
 //		
 //		List<Track> parziale = new ArrayList<>();
 //		best = new ArrayList<>();
 //		parziale.add(preferita);
 //
-//		cerca(parziale, canzoniValide, memoriaMassima);		
+//		cerca(parziale, canzoniValide, memoriaMassima, 1);		
 //		
 //		return best;
 //	}
 //	
-//	private void cerca(List<Track> parziale, List<Track> canzoniValide, int memoriaMassima) {
+//	private void cerca(List<Track> parziale, List<Track> canzoniValide, int memoriaMassima, int livello) {
+//		// Condizione di terminazione
+//		if (sommaBytes(parziale) > memoriaMassima)
+//			return;
 //		
+//		// se non esco, vuol dire che la soluzione parziale è ancora valida
 //		if (parziale.size() > best.size()) {
 //			best = new LinkedList<>(parziale);
 //		}
+//		
+//		if (livello == canzoniValide.size()) 
+//			return; // esco perchè non abbiamo più canzoni da poter aggiungere alla lista
+//	
+//		
+//		parziale.add(canzoniValide.get(livello));
+//		cerca(parziale, canzoniValide, memoriaMassima, livello+1);
+//		parziale.remove(canzoniValide.get(livello));
+//		cerca(parziale, canzoniValide, memoriaMassima, livello+1);
+//			
+//	}
+	
+	public List<Track> creaLista(Track preferita, int memoriaMassima){
+		// calcoliamo la componente connessa di c
+		ConnectivityInspector<Track, DefaultWeightedEdge> ci = new ConnectivityInspector<>(this.grafo);
+		Set<Track> componenteConnessa = ci.connectedSetOf(preferita);
+		
+		List<Track> canzoniValide = new ArrayList<>();
+	
+		canzoniValide.addAll(componenteConnessa);
+		
+		List<Track> parziale = new ArrayList<>();
+		best = new ArrayList<>();
+		parziale.add(preferita);
+
+		cerca(parziale, canzoniValide, memoriaMassima);		
+		
+		return best;
+	}
+	
+	private void cerca(List<Track> parziale, List<Track> canzoniValide, int memoriaMassima) {
+		
+		if (parziale.size() > best.size()) {
+			best = new LinkedList<>(parziale);
+		}
+				
+		for (Track t : canzoniValide) {
+			if (!parziale.contains(t) && (sommaBytes(parziale) + t.getBytes()) <= memoriaMassima) {
+				parziale.add(t);
+				cerca(parziale, canzoniValide, memoriaMassima);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+		
+	}
+	
+//	public List<Track> creaLista(Track preferita, int memoriaMassima){
 //				
-//		for (Track t : canzoniValide) {
-//			if (!parziale.contains(t) && (sommaBytes(parziale) + t.getBytes()) <= memoriaMassima) {
+//		List<Track> parziale = new ArrayList<>();
+//		best = new ArrayList<>();
+//		parziale.add(preferita);
+//
+//		cerca(parziale, memoriaMassima);		
+//		
+//		return best;
+//	}
+//	
+//	private void cerca(List<Track> parziale, int memoriaMassima) {
+//		
+//		if (sommaBytes(parziale) > memoriaMassima)
+//			return; // parziale non rappresenta una soluzione valida
+//		
+//		// se non esco, vuol dire che la soluzione parziale è ancora valida
+//		if (parziale.size() > best.size()) { // nel caso in cui la soluzione parziale contenga un numero 
+//			best = new LinkedList<>(parziale); // maggiore di elementi allora aggiorno la soluzione migliore 
+//		}
+//		
+//		if (parziale.size() == Graphs.neighborListOf(this.grafo, parziale.get(0)).size()+1) 
+//			return; // esco perchè non abbiamo più canzoni da poter aggiungere alla lista
+//		
+//		for (Track t : Graphs.neighborListOf(this.grafo, parziale.get(0))){
+//			if (!parziale.contains(t)) {
 //				parziale.add(t);
-//				cerca(parziale, canzoniValide, memoriaMassima);
-//				parziale.remove(parziale.size()-1);
+//				cerca(parziale, memoriaMassima);
+//				parziale.remove(t);
 //			}
 //		}
 //		
